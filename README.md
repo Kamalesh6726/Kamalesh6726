@@ -1,9 +1,9 @@
-- 👋 Hi, I’m @Kamalesh
+- 👋 Hi, I’m Kamalesh Ganesh
 - 👀 I’m interested in coding 
 - 🌱 I’m currently learning AI & Ds
-- 💞️ I’m looking to collaborate on
-- 📫 How to reach me ...
-- 😄 Pronouns: ...
+- 💞️ I’m completed prompt engineering 
+- 📫 How to reach me kamaleshganesh6726@gmail.com
+- 😄 iam interested to work in IBM
 - ⚡ Fun fact: ...
 
 <!---
