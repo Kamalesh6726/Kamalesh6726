@@ -4,7 +4,7 @@
 - 💞️ I’m completed prompt engineering 
 - 📫 How to reach me kamaleshganesh6726@gmail.com
 - 😄 iam interested to work in IBM
-- ⚡ Fun fact: ...
+  
 
 <!---
 Kamalesh6726/Kamalesh6726 is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
