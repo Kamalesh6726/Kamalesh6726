@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumCalc - World's Most Advanced Calculator</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --text: #ecf0f1;
+            --display: #1a1a2e;
+            --button: #3d3d3d;
+            --button-hover: #4d4d4d;
+            --button-active: #2d2d2d;
+            --operator: #e67e22;
+            --operator-hover: #f39c12;
+            --operator-active: #d35400;
+            --equals: #27ae60;
+            --equals-hover: #2ecc71;
+            --equals-active: #16a085;
+            --function: #9b59b6;
+            --function-hover: #8e44ad;
+            --function-active: #7d3c98;
+            --error: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--secondary);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .main-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .display-container {
+            background-color: var(--display);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .history {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            min-height: 20px;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .display {
+            font-size: 2.5rem;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .display.error {
+            color: var(--error);
+            font-size: 1.5rem;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text);
+            background-color: var(--button);
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            background-color: var(--button-active);
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .operator {
+            background-color: var(--operator);
+        }
+
+        .operator:hover {
+            background-color: var(--operator-hover);
+        }
+
+        .operator:active {
+            background-color: var(--operator-active);
+        }
+
+        .equals {
+            background-color: var(--equals);
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background-color: var(--equals-hover);
+        }
+
+        .equals:active {
+            background-color: var(--equals-active);
+        }
+
+        .function {
+            background-color: var(--function);
+            font-size: 1rem;
+        }
+
+        .function:hover {
+            background-color: var(--function-hover);
+        }
+
+        .function:active {
+            background-color: var(--function-active);
+        }
+
+        .advanced-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background-color: var(--primary);
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background-color: var(--accent);
+        }
+
+        .tab.active {
+            background-color: var(--secondary);
+        }
+
+        .tab-content {
+            background-color: var(--display);
+            border-radius: 0 15px 15px 15px;
+            padding: 20px;
+            flex-grow: 1;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .graph-container {
+            height: 300px;
+            background-color: var(--primary);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .graph-controls input, 
+        .graph-controls select {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--primary);
+            color: var(--text);
+        }
+
+        .graph-controls button {
+            padding: 10px;
+        }
+
+        .conversion-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .conversion-section select, 
+        .conversion-section input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--primary);
+            color: var(--text);
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--primary);
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: var(--primary);
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--primary);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: var(--primary);
+        }
+
+        .constants-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .constants-grid button {
+            padding: 10px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversion-result {
+            grid-column: span 2;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--primary);
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .graph-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .graph-options select {
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .calculator {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .equals {
+                grid-column: span 1;
+            }
+            
+            .display {
+                font-size: 2rem;
+            }
+            
+            .constants-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 10px;
+            }
+            
+            .buttons {
+                gap: 5px;
+            }
+            
+            button {
+                padding: 12px 0;
+                font-size: 1rem;
+            }
+            
+            .function {
+                font-size: 0.9rem;
+            }
+            
+            .constants-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="main-section">
+            <div class="display-container">
+                <div class="history" id="history"></div>
+                <div class="display" id="display">0</div>
+            </div>
+            <div class="buttons">
+                <button class="function" onclick="handleFunction('sqrt(')">√</button>
+                <button class="function" onclick="handleFunction('pow(')">x^y</button>
+                <button class="function" onclick="handleFunction('sin(')">sin</button>
+                <button class="function" onclick="handleFunction('cos(')">cos</button>
+                <button class="function" onclick="handleFunction('tan(')">tan</button>
+                
+                <button class="function" onclick="handleFunction('log(')">log</button>
+                <button class="function" onclick="handleFunction('ln(')">ln</button>
+                <button class="function" onclick="handleFunction('fact(')">n!</button>
+                <button class="function" onclick="handleFunction('pi')">π</button>
+                <button class="function" onclick="handleFunction('e')">e</button>
+                
+                <button class="function" onclick="handleFunction('(')">(</button>
+                <button class="function" onclick="handleFunction(')')">)</button>
+                <button class="function" onclick="handleFunction('abs(')">|x|</button>
+                <button class="operator" onclick="handleOperator('/')">/</button>
+                <button class="operator" onclick="clearDisplay()">C</button>
+                
+                <button onclick="appendNumber(7)">7</button>
+                <button onclick="appendNumber(8)">8</button>
+                <button onclick="appendNumber(9)">9</button>
+                <button class="operator" onclick="handleOperator('*')">×</button>
+                <button class="function" onclick="backspace()">⌫</button>
+                
+                <button onclick="appendNumber(4)">4</button>
+                <button onclick="appendNumber(5)">5</button>
+                <button onclick="appendNumber(6)">6</button>
+                <button class="operator" onclick="handleOperator('-')">-</button>
+                <button class="function" onclick="handleFunction('1/')">1/x</button>
+                
+                <button onclick="appendNumber(1)">1</button>
+                <button onclick="appendNumber(2)">2</button>
+                <button onclick="appendNumber(3)">3</button>
+                <button class="operator" onclick="handleOperator('+')">+</button>
+                <button class="function" onclick="handleFunction('^2')">x²</button>
+                
+                <button onclick="appendNumber(0)">0</button>
+                <button onclick="appendDecimal()">.</button>
+                <button class="function" onclick="toggleSign()">±</button>
+                <button class="equals" onclick="calculate()">=</button>
+                <button class="function" onclick="handleFunction('rand(')">Rand</button>
+            </div>
+        </div>
+        
+        <div class="advanced-section">
+            <div class="tabs">
+                <button class="tab active" onclick="openTab('graph')">Graph</button>
+                <button class="tab" onclick="openTab('converter')">Converter</button>
+                <button class="tab" onclick="openTab('history-tab')">History</button>
+                <button class="tab" onclick="openTab('constants')">Constants</button>
+                <button class="tab" onclick="openTab('scientific')">Scientific</button>
+            </div>
+            
+            <div id="graph" class="tab-content active">
+                <div class="graph-options">
+                    <select id="graphType">
+                        <option value="function">Function (y=f(x))</option>
+                        <option value="parametric">Parametric</option>
+                        <option value="polar">Polar</option>
+                    </select>
+                    <select id="graphColor">
+                        <option value="#e74c3c">Red</option>
+                        <option value="#3498db">Blue</option>
+                        <option value="#2ecc71">Green</option>
+                        <option value="#f1c40f">Yellow</option>
+                        <option value="#9b59b6">Purple</option>
+                    </select>
+                </div>
+                <div class="graph-container">
+                    <canvas id="graphCanvas" class="graph"></canvas>
+                </div>
+                <div class="graph-controls">
+                    <input type="text" id="graphEquation" placeholder="Enter equation (e.g., sin(x))">
+                    <button onclick="plotGraph()">Plot</button>
+                    <input type="number" id="xMin" placeholder="x min" value="-10">
+                    <input type="number" id="xMax" placeholder="x max" value="10">
+                </div>
+                <div class="graph-controls" id="yRangeControls">
+                    <input type="number" id="yMin" placeholder="y min" value="-10">
+                    <input type="number" id="yMax" placeholder="y max" value="10">
+                    <button onclick="autoScaleY()">Auto Scale Y</button>
+                    <button onclick="clearGraph()">Clear Graph</button>
+                </div>
+            </div>
+            
+            <div id="converter" class="tab-content">
+                <div class="conversion-section">
+                    <select id="conversionType">
+                        <option value="length">Length</option>
+                        <option value="area">Area</option>
+                        <option value="volume">Volume</option>
+                        <option value="weight">Weight</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="speed">Speed</option>
+                        <option value="time">Time</option>
+                        <option value="digital">Digital Storage</option>
+                        <option value="currency">Currency (USD)</option>
+                    </select>
+                    <select id="fromUnit"></select>
+                    <input type="number" id="fromValue" placeholder="Value" step="any">
+                    <select id="toUnit"></select>
+                    <button onclick="convertUnits()">Convert</button>
+                    <div id="conversionResult" class="conversion-result"></div>
+                </div>
+            </div>
+            
+            <div id="history-tab" class="tab-content">
+                <div class="history-list" id="historyList">
+                    <!-- History items will be added here -->
+                </div>
+                <button style="margin-top: 10px; width: 100%;" onclick="clearHistory()">Clear History</button>
+            </div>
+            
+            <div id="constants" class="tab-content">
+                <div class="constants-grid">
+                    <!-- Constants will be added here -->
+                </div>
+            </div>
+            
+            <div id="scientific" class="tab-content">
+                <div class="buttons" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 10px;">
+                    <button class="function" onclick="handleFunction('asin(')">sin⁻¹</button>
+                    <button class="function" onclick="handleFunction('acos(')">cos⁻¹</button>
+                    <button class="function" onclick="handleFunction('atan(')">tan⁻¹</button>
+                </div>
+                <div class="buttons" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 10px;">
+                    <button class="function" onclick="handleFunction('sinh(')">sinh</button>
+                    <button class="function" onclick="handleFunction('cosh(')">cosh</button>
+                    <button class="function" onclick="handleFunction('tanh(')">tanh</button>
+                </div>
+                <div class="buttons" style="grid-template-columns: repeat(3, 1fr);">
+                    <button class="function" onclick="handleFunction('deg(')">deg</button>
+                    <button class="function" onclick="handleFunction('rad(')">rad</button>
+                    <button class="function" onclick="handleFunction('mod(')">mod</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <select id="angleMode" style="width: 100%; padding: 10px; border-radius: 5px; background-color: var(--primary); color: var(--text);">
+                        <option value="deg">Degrees</option>
+                        <option value="rad" selected>Radians</option>
+                        <option value="grad">Gradians</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main Calculator Logic
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let resetInput = false;
+        let calculationHistory = [];
+        let angleMode = 'rad'; // 'deg', 'rad', or 'grad'
+        
+        const display = document.getElementById('display');
+        const historyDisplay = document.getElementById('history');
+        const historyList = document.getElementById('historyList');
+        const angleModeSelect = document.getElementById('angleMode');
+        
+        // Initialize the calculator
+        updateDisplay();
+        setupConstants();
+        setupUnitConverters();
+        setupGraphCanvas();
+        
+        // Angle mode change handler
+        angleModeSelect.addEventListener('change', function() {
+            angleMode = this.value;
+        });
+        
+        function updateDisplay() {
+            display.textContent = currentInput;
+            display.className = currentInput === 'Error' ? 'display error' : 'display';
+            historyDisplay.textContent = previousInput + (operation ? ' ' + operation : '');
+        }
+        
+        function appendNumber(number) {
+            if (currentInput === '0' || resetInput) {
+                currentInput = number.toString();
+                resetInput = false;
+            } else {
+                currentInput += number.toString();
+            }
+            updateDisplay();
+        }
+        
+        function appendDecimal() {
+            if (resetInput) {
+                currentInput = '0.';
+                resetInput = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+        
+        function toggleSign() {
+            if (currentInput.startsWith('-')) {
+                currentInput = currentInput.substring(1);
+            } else {
+                currentInput = '-' + currentInput;
+            }
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            updateDisplay();
+        }
+        
+        function backspace() {
+            if (currentInput === 'Error') {
+                currentInput = '0';
+            } else if (currentInput.length === 1 || (currentInput.length === 2 && currentInput.startsWith('-'))) {
+                currentInput = '0';
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+            updateDisplay();
+        }
+        
+        function handleOperator(op) {
+            if (operation !== null) calculate();
+            previousInput = currentInput;
+            operation = op;
+            resetInput = true;
+            updateDisplay();
+        }
+        
+        function handleFunction(func) {
+            if (func === 'pi') {
+                currentInput = Math.PI.toString();
+            } else if (func === 'e') {
+                currentInput = Math.E.toString();
+            } else if (func === '^2') {
+                currentInput = `pow(${currentInput},2)`;
+                calculate();
+            } else if (func === '1/') {
+                currentInput = `1/(${currentInput})`;
+                calculate();
+            } else if (func === 'rand(') {
+                currentInput = Math.random().toString();
+            } else {
+                currentInput = func + currentInput;
+                if (func === 'sqrt(' || func === 'abs(' || func === 'sin(' || func === 'cos(' || 
+                    func === 'tan(' || func === 'log(' || func === 'ln(' || func === 'asin(' || 
+                    func === 'acos(' || func === 'atan(' || func === 'sinh(' || func === 'cosh(' || 
+                    func === 'tanh(' || func === 'deg(' || func === 'rad(') {
+                    currentInput += ')';
+                }
+            }
+            updateDisplay();
+        }
+        
+        function calculate() {
+            let computation;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(current)) {
+                // Try evaluating as expression
+                try {
+                    computation = evaluateExpression(currentInput);
+                } catch (e) {
+                    computation = 'Error';
+                }
+            } else {
+                switch (operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '*':
+                        computation = prev * current;
+                        break;
+                    case '/':
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+            }
+            
+            // Add to history
+            if (computation !== 'Error') {
+                const historyEntry = {
+                    expression: previousInput + (operation ? ' ' + operation + ' ' + currentInput : currentInput),
+                    result: computation.toString(),
+                    timestamp: new Date().toISOString()
+                };
+                calculationHistory.push(historyEntry);
+                updateHistoryList();
+                
+                // Save to localStorage
+                saveHistory();
+            }
+            
+            currentInput = computation.toString();
+            operation = null;
+            previousInput = '';
+            resetInput = true;
+            updateDisplay();
+        }
+        
+        function evaluateExpression(expr) {
+            // Replace pow(x,y) with x^y
+            expr = expr.replace(/pow\(([^,]+),([^)]+)\)/g, '($1)**($2)');
+            // Replace sqrt(x) with x^0.5
+            expr = expr.replace(/sqrt\(([^)]+)\)/g, '($1)**0.5');
+            // Replace mod(x,y) with x%y
+            expr = expr.replace(/mod\(([^,]+),([^)]+)\)/g, '($1)%($2)');
+            // Replace fact(x) with factorial
+            expr = expr.replace(/fact\(([^)]+)\)/g, (match, n) => {
+                n = parseFloat(n);
+                if (n < 0) return 'NaN';
+                let result = 1;
+                for (let i = 2; i <= n; i++) result *= i;
+                return result.toString();
+            });
+            // Replace constants
+            expr = expr.replace(/pi/g, Math.PI.toString());
+            expr = expr.replace(/e/g, Math.E.toString());
+            
+            // Handle trigonometric functions with angle mode conversion
+            const trigFunctions = {
+                'sin': Math.sin,
+                'cos': Math.cos,
+                'tan': Math.tan,
+                'asin': Math.asin,
+                'acos': Math.acos,
+                'atan': Math.atan,
+                'sinh': Math.sinh,
+                'cosh': Math.cosh,
+                'tanh': Math.tanh
+            };
+            
+            for (const [func, fn] of Object.entries(trigFunctions)) {
+                expr = expr.replace(new RegExp(`${func}\\(([^)]+)\\)`, 'g'), (match, n) => {
+                    let angle = parseFloat(n);
+                    // Convert to radians if needed
+                    if (func.startsWith('a')) {
+                        // Inverse functions - output depends on angle mode
+                        angle = fn(angle);
+                        if (angleMode === 'deg') return (angle * 180 / Math.PI).toString();
+                        if (angleMode === 'grad') return (angle * 200 / Math.PI).toString();
+                        return angle.toString();
+                    } else {
+                        // Regular functions - input depends on angle mode
+                        if (angleMode === 'deg') angle = angle * Math.PI / 180;
+                        if (angleMode === 'grad') angle = angle * Math.PI / 200;
+                        return fn(angle).toString();
+                    }
+                });
+            }
+            
+            // Handle degree/radian conversion
+            expr = expr.replace(/deg\(([^)]+)\)/g, (match, n) => (parseFloat(n) * 180 / Math.PI).toString());
+            expr = expr.replace(/rad\(([^)]+)\)/g, (match, n) => (parseFloat(n) * Math.PI / 180).toString());
+            
+            // Handle logarithms
+            expr = expr.replace(/log\(([^)]+)\)/g, (match, n) => Math.log10(parseFloat(n)).toString());
+            expr = expr.replace(/ln\(([^)]+)\)/g, (match, n) => Math.log(parseFloat(n)).toString());
+            // Handle absolute value
+            expr = expr.replace(/abs\(([^)]+)\)/g, (match, n) => Math.abs(parseFloat(n)).toString());
+            
+            // Evaluate the expression
+            try {
+                return eval(expr);
+            } catch (e) {
+                return 'Error';
+            }
+        }
+        
+        // Advanced Features
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Resize graph canvas when tab is opened
+            if (tabName === 'graph') {
+                resizeGraphCanvas();
+            }
+        }
+        
+        // Graphing Calculator
+        let graphCanvas, graphCtx;
+        let graphData = [];
+        let graphColors = [];
+        
+        function setupGraphCanvas() {
+            graphCanvas = document.getElementById('graphCanvas');
+            graphCtx = graphCanvas.getContext('2d');
+            resizeGraphCanvas();
+        }
+        
+        function resizeGraphCanvas() {
+            const container = document.querySelector('.graph-container');
+            graphCanvas.width = container.offsetWidth;
+            graphCanvas.height = container.offsetHeight;
+            redrawGraph();
+        }
+        
+        window.addEventListener('resize', function() {
+            if (document.getElementById('graph').classList.contains('active')) {
+                resizeGraphCanvas();
+            }
+        });
+        
+        function plotGraph() {
+            const equation = document.getElementById('graphEquation').value;
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            const yMin = parseFloat(document.getElementById('yMin').value);
+            const yMax = parseFloat(document.getElementById('yMax').value);
+            const graphType = document.getElementById('graphType').value;
+            const color = document.getElementById('graphColor').value;
+            
+            if (!equation || isNaN(xMin) || isNaN(xMax) || isNaN(yMin) || isNaN(yMax)) {
+                alert('Please enter valid equation and range');
+                return;
+            }
+            
+            // Clear canvas
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            // Draw axes
+            drawAxes(xMin, xMax, yMin, yMax);
+            
+            // Calculate points
+            const points = [];
+            const step = (xMax - xMin) / graphCanvas.width * 2; // Higher resolution
+            
+            for (let x = xMin; x <= xMax; x += step) {
+                try {
+                    let expr, y;
+                    
+                    if (graphType === 'function') {
+                        expr = equation.replace(/x/g, `(${x})`);
+                        y = evaluateExpression(expr);
+                    } else if (graphType === 'parametric') {
+                        // Parametric equations should be in format "x(t),y(t)"
+                        const parts = equation.split(',');
+                        if (parts.length !== 2) {
+                            alert('Parametric equations should be in format "x(t),y(t)"');
+                            return;
+                        }
+                        const xExpr = parts[0].replace(/t/g, `(${x})`);
+                        const yExpr = parts[1].replace(/t/g, `(${x})`);
+                        const xVal = evaluateExpression(xExpr);
+                        const yVal = evaluateExpression(yExpr);
+                        
+                        points.push({x: xVal, y: yVal});
+                        continue;
+                    } else if (graphType === 'polar') {
+                        // Polar equations should be in format "r(θ)"
+                        expr = equation.replace(/theta/g, `(${x})`).replace(/θ/g, `(${x})`);
+                        const r = evaluateExpression(expr);
+                        y = r * Math.sin(x);
+                        x = r * Math.cos(x);
+                    }
+                    
+                    if (!isNaN(y) && isFinite(y)) {
+                        points.push({x, y});
+                    }
+                } catch (e) {
+                    // Skip points that cause errors
+                }
+            }
+            
+            // Store graph data
+            graphData.push(points);
+            graphColors.push(color);
+            
+            // Draw all graphs
+            redrawGraph();
+        }
+        
+        function drawAxes(xMin, xMax, yMin, yMax) {
+            graphCtx.strokeStyle = '#7f8c8d';
+            graphCtx.lineWidth = 1;
+            
+            // X axis
+            const xAxisY = graphCanvas.height - (0 - yMin) / (yMax - yMin) * graphCanvas.height;
+            if (xAxisY >= 0 && xAxisY <= graphCanvas.height) {
+                graphCtx.beginPath();
+                graphCtx.moveTo(0, xAxisY);
+                graphCtx.lineTo(graphCanvas.width, xAxisY);
+                graphCtx.stroke();
+                
+                // X axis ticks
+                const xStep = calculateStep(xMin, xMax);
+                for (let x = Math.ceil(xMin / xStep) * xStep; x <= xMax; x += xStep) {
+                    const pixelX = (x - xMin) / (xMax - xMin) * graphCanvas.width;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(pixelX, xAxisY - 5);
+                    graphCtx.lineTo(pixelX, xAxisY + 5);
+                    graphCtx.stroke();
+                    
+                    // Label
+                    if (Math.abs(x) > 0.001) {
+                        graphCtx.fillStyle = '#ecf0f1';
+                        graphCtx.font = '10px Arial';
+                        graphCtx.textAlign = 'center';
+                        graphCtx.fillText(x.toFixed(2), pixelX, xAxisY + 18);
+                    }
+                }
+            }
+            
+            // Y axis
+            const yAxisX = (0 - xMin) / (xMax - xMin) * graphCanvas.width;
+            if (yAxisX >= 0 && yAxisX <= graphCanvas.width) {
+                graphCtx.beginPath();
+                graphCtx.moveTo(yAxisX, 0);
+                graphCtx.lineTo(yAxisX, graphCanvas.height);
+                graphCtx.stroke();
+                
+                // Y axis ticks
+                const yStep = calculateStep(yMin, yMax);
+                for (let y = Math.ceil(yMin / yStep) * yStep; y <= yMax; y += yStep) {
+                    const pixelY = graphCanvas.height - (y - yMin) / (yMax - yMin) * graphCanvas.height;
+                    graphCtx.beginPath();
+                    graphCtx.moveTo(yAxisX - 5, pixelY);
+                    graphCtx.lineTo(yAxisX + 5, pixelY);
+                    graphCtx.stroke();
+                    
+                    // Label
+                    if (Math.abs(y) > 0.001) {
+                        graphCtx.fillStyle = '#ecf0f1';
+                        graphCtx.font = '10px Arial';
+                        graphCtx.textAlign = 'right';
+                        graphCtx.fillText(y.toFixed(2), yAxisX - 8, pixelY + 3);
+                    }
+                }
+            }
+            
+            // Origin label
+            if (xMin < 0 && xMax > 0 && yMin < 0 && yMax > 0) {
+                graphCtx.fillStyle = '#ecf0f1';
+                graphCtx.font = '10px Arial';
+                graphCtx.textAlign = 'right';
+                graphCtx.fillText('0', yAxisX - 8, xAxisY + 12);
+            }
+        }
+        
+        function calculateStep(min, max) {
+            const range = max - min;
+            const step = Math.pow(10, Math.floor(Math.log10(range))) / 2;
+            return step;
+        }
+        
+        function redrawGraph() {
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            const yMin = parseFloat(document.getElementById('yMin').value);
+            const yMax = parseFloat(document.getElementById('yMax').value);
+            
+            // Clear canvas
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            // Draw axes
+            drawAxes(xMin, xMax, yMin, yMax);
+            
+            // Draw all graphs
+            for (let i = 0; i < graphData.length; i++) {
+                const points = graphData[i];
+                const color = graphColors[i];
+                
+                if (points.length > 0) {
+                    graphCtx.strokeStyle = color;
+                    graphCtx.lineWidth = 2;
+                    graphCtx.beginPath();
+                    
+                    // Convert first point to pixel coordinates
+                    const firstPoint = points[0];
+                    const pixelX = (firstPoint.x - xMin) / (xMax - xMin) * graphCanvas.width;
+                    const pixelY = graphCanvas.height - (firstPoint.y - yMin) / (yMax - yMin) * graphCanvas.height;
+                    graphCtx.moveTo(pixelX, pixelY);
+                    
+                    // Draw the rest of the points
+                    for (let j = 1; j < points.length; j++) {
+                        const point = points[j];
+                        const px = (point.x - xMin) / (xMax - xMin) * graphCanvas.width;
+                        const py = graphCanvas.height - (point.y - yMin) / (yMax - yMin) * graphCanvas.height;
+                        
+                        // Only draw if the point is within visible range
+                        if (!isNaN(px) && !isNaN(py) && isFinite(px) && isFinite(py)) {
+                            graphCtx.lineTo(px, py);
+                        } else {
+                            graphCtx.stroke();
+                            graphCtx.beginPath();
+                            if (j + 1 < points.length) {
+                                const nextPoint = points[j + 1];
+                                const nextPx = (nextPoint.x - xMin) / (xMax - xMin) * graphCanvas.width;
+                                const nextPy = graphCanvas.height - (nextPoint.y - yMin) / (yMax - yMin) * graphCanvas.height;
+                                graphCtx.moveTo(nextPx, nextPy);
+                            }
+                        }
+                    }
+                    
+                    graphCtx.stroke();
+                }
+            }
+        }
+        
+        function autoScaleY() {
+            if (graphData.length === 0) return;
+            
+            let yMin = Infinity;
+            let yMax = -Infinity;
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            
+            // Find min and max y values across all graphs
+            for (const points of graphData) {
+                for (const point of points) {
+                    if (!isNaN(point.y) && isFinite(point.y)) {
+                        yMin = Math.min(yMin, point.y);
+                        yMax = Math.max(yMax, point.y);
+                    }
+                }
+            }
+            
+            // Add some padding
+            const padding = (yMax - yMin) * 0.1;
+            yMin -= padding;
+            yMax += padding;
+            
+            // If all values are the same (e.g., y=5), set a reasonable range
+            if (yMin === yMax) {
+                yMin = yMin - 5;
+                yMax = yMax + 5;
+            }
+            
+            // Update the input fields
+            document.getElementById('yMin').value = yMin.toFixed(2);
+            document.getElementById('yMax').value = yMax.toFixed(2);
+            
+            // Redraw the graph
+            redrawGraph();
+        }
+        
+        function clearGraph() {
+            graphData = [];
+            graphColors = [];
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            drawAxes(
+                parseFloat(document.getElementById('xMin').value),
+                parseFloat(document.getElementById('xMax').value),
+                parseFloat(document.getElementById('yMin').value),
+                parseFloat(document.getElementById('yMax').value)
+            );
+        }
+        
+        // Unit Converter
+        function setupUnitConverters() {
+            const conversionType = document.getElementById('conversionType');
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            
+            // Populate initial units
+            updateUnitOptions();
+            
+            // Update units when type changes
+            conversionType.addEventListener('change', updateUnitOptions);
+            
+            function updateUnitOptions() {
+                const type = conversionType.value;
+                let units = [];
+                
+                switch (type) {
+                    case 'length':
+                        units = ['meter', 'kilometer', 'centimeter', 'millimeter', 'mile', 'yard', 'foot', 'inch', 'nautical mile'];
+                        break;
+                    case 'area':
+                        units = ['square meter', 'square kilometer', 'square mile', 'square yard', 'square foot', 'square inch', 'hectare', 'acre'];
+                        break;
+                    case 'volume':
+                        units = ['liter', 'milliliter', 'cubic meter', 'cubic centimeter', 'cubic inch', 'gallon', 'quart', 'pint', 'cup', 'fluid ounce', 'barrel'];
+                        break;
+                    case 'weight':
+                        units = ['kilogram', 'gram', 'milligram', 'metric ton', 'pound', 'ounce', 'stone', 'carat'];
+                        break;
+                    case 'temperature':
+                        units = ['celsius', 'fahrenheit', 'kelvin'];
+                        break;
+                    case 'speed':
+                        units = ['meters per second', 'kilometers per hour', 'miles per hour', 'knot', 'foot per second', 'mach'];
+                        break;
+                    case 'time':
+                        units = ['second', 'millisecond', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'century'];
+                        break;
+                    case 'digital':
+                        units = ['bit', 'byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'exabyte'];
+                        break;
+                    case 'currency':
+                        units = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'SEK', 'NZD', 'MXN', 'SGD', 'HKD', 'NOK', 'KRW', 'TRY', 'INR', 'BRL', 'ZAR', 'RUB'];
+                        break;
+                }
+                
+                // Clear existing options
+                fromUnit.innerHTML = '';
+                toUnit.innerHTML = '';
+                
+                // Add new options
+                units.forEach(unit => {
+                    const option1 = document.createElement('option');
+                    option1.value = unit;
+                    option1.textContent = unit;
+                    fromUnit.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = unit;
+                    option2.textContent = unit;
+                    toUnit.appendChild(option2);
+                });
+                
+                // Set different default to units
+                if (units.length > 1) {
+                    toUnit.selectedIndex = 1;
+                }
+                
+                // Special case for currency - default to USD to EUR
+                if (type === 'currency') {
+                    fromUnit.value = 'USD';
+                    toUnit.value = 'EUR';
+                }
+            }
+        }
+        
+        async function convertUnits() {
+            const type = document.getElementById('conversionType').value;
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const fromValue = parseFloat(document.getElementById('fromValue').value);
+            const resultElement = document.getElementById('conversionResult');
+            
+            if (isNaN(fromValue)) {
+                resultElement.textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            let result;
+            
+            // Currency conversion (requires API call)
+            if (type === 'currency') {
+                try {
+                    resultElement.textContent = 'Fetching exchange rates...';
+                    const conversionRate = await getExchangeRate(fromUnit, toUnit);
+                    result = fromValue * conversionRate;
+                    resultElement.textContent = `${fromValue} ${fromUnit} = ${result.toFixed(4)} ${toUnit}`;
+                    return;
+                } catch (error) {
+                    resultElement.textContent = 'Error fetching exchange rates. Using offline rates.';
+                    // Fall through to offline conversion with approximate rates
+                }
+            }
+            
+            // Length conversions
+            if (type === 'length') {
+                const toMeter = {
+                    'meter': 1,
+                    'kilometer': 1000,
+                    'centimeter': 0.01,
+                    'millimeter': 0.001,
+                    'mile': 1609.344,
+                    'yard': 0.9144,
+                    'foot': 0.3048,
+                    'inch': 0.0254,
+                    'nautical mile': 1852
+                };
+                
+                const meters = fromValue * toMeter[fromUnit];
+                result = meters / toMeter[toUnit];
+            }
+            // Area conversions
+            else if (type === 'area') {
+                const toSquareMeter = {
+                    'square meter': 1,
+                    'square kilometer': 1000000,
+                    'square mile': 2589988.11,
+                    'square yard': 0.83612736,
+                    'square foot': 0.09290304,
+                    'square inch': 0.00064516,
+                    'hectare': 10000,
+                    'acre': 4046.8564224
+                };
+                
+                const squareMeters = fromValue * toSquareMeter[fromUnit];
+                result = squareMeters / toSquareMeter[toUnit];
+            }
+            // Volume conversions
+            else if (type === 'volume') {
+                const toLiter = {
+                    'liter': 1,
+                    'milliliter': 0.001,
+                    'cubic meter': 1000,
+                    'cubic centimeter': 0.001,
+                    'cubic inch': 0.016387064,
+                    'gallon': 3.785411784,
+                    'quart': 0.946352946,
+                    'pint': 0.473176473,
+                    'cup': 0.2365882365,
+                    'fluid ounce': 0.0295735295625,
+                    'barrel': 119.240471
+                };
+                
+                const liters = fromValue * toLiter[fromUnit];
+                result = liters / toLiter[toUnit];
+            }
+            // Weight conversions
+            else if (type === 'weight') {
+                const toKilogram = {
+                    'kilogram': 1,
+                    'gram': 0.001,
+                    'milligram': 0.000001,
+                    'metric ton': 1000,
+                    'pound': 0.45359237,
+                    'ounce': 0.028349523125,
+                    'stone': 6.35029318,
+                    'carat': 0.0002
+                };
+                
+                const kilograms = fromValue * toKilogram[fromUnit];
+                result = kilograms / toKilogram[toUnit];
+            }
+            // Temperature conversions
+            else if (type === 'temperature') {
+                if (fromUnit === 'celsius') {
+                    if (toUnit === 'fahrenheit') {
+                        result = (fromValue * 9/5) + 32;
+                    } else if (toUnit === 'kelvin') {
+                        result = fromValue + 273.15;
+                    } else {
+                        result = fromValue;
+                    }
+                } else if (fromUnit === 'fahrenheit') {
+                    if (toUnit === 'celsius') {
+                        result = (fromValue - 32) * 5/9;
+                    } else if (toUnit === 'kelvin') {
+                        result = (fromValue - 32) * 5/9 + 273.15;
+                    } else {
+                        result = fromValue;
+                    }
+                } else if (fromUnit === 'kelvin') {
+                    if (toUnit === 'celsius') {
+                        result = fromValue - 273.15;
+                    } else if (toUnit === 'fahrenheit') {
+                        result = (fromValue - 273.15) * 9/5 + 32;
+                    } else {
+                        result = fromValue;
+                    }
+                }
+            }
+            // Speed conversions
+            else if (type === 'speed') {
+                const toMetersPerSecond = {
+                    'meters per second': 1,
+                    'kilometers per hour': 0.277778,
+                    'miles per hour': 0.44704,
+                    'knot': 0.514444,
+                    'foot per second': 0.3048,
+                    'mach': 343
+                };
+                
+                const metersPerSecond = fromValue * toMetersPerSecond[fromUnit];
+                result = metersPerSecond / toMetersPerSecond[toUnit];
+            }
+            // Time conversions
+            else if (type === 'time') {
+                const toSeconds = {
+                    'second': 1,
+                    'millisecond': 0.001,
+                    'minute': 60,
+                    'hour': 3600,
+                    'day': 86400,
+                    'week': 604800,
+                    'month': 2628000, // Approximate
+                    'year': 31536000, // Approximate
+                    'decade': 315360000,
+                    'century': 3153600000
+                };
+                
+                const seconds = fromValue * toSeconds[fromUnit];
+                result = seconds / toSeconds[toUnit];
+            }
+            // Digital storage conversions
+            else if (type === 'digital') {
+                const toBits = {
+                    'bit': 1,
+                    'byte': 8,
+                    'kilobyte': 8192,
+                    'megabyte': 8388608,
+                    'gigabyte': 8589934592,
+                    'terabyte': 8796093022208,
+                    'petabyte': 9007199254740992,
+                    'exabyte': 9223372036854776000
+                };
+                
+                const bits = fromValue * toBits[fromUnit];
+                result = bits / toBits[toUnit];
+            }
+            // Currency conversions (offline fallback)
+            else if (type === 'currency') {
+                // Approximate exchange rates (fallback)
+                const rates = {
+                    'USD': 1,
+                    'EUR': 0.85,
+                    'GBP': 0.73,
+                    'JPY': 110.15,
+                    'AUD': 1.29,
+                    'CAD': 1.21,
+                    'CHF': 0.92,
+                    'CNY': 6.47,
+                    'SEK': 8.58,
+                    'NZD': 1.39,
+                    'MXN': 20.02,
+                    'SGD': 1.35,
+                    'HKD': 7.77,
+                    'NOK': 8.53,
+                    'KRW': 1143.50,
+                    'TRY': 8.45,
+                    'INR': 74.85,
+                    'BRL': 5.20,
+                    'ZAR': 14.50,
+                    'RUB': 73.75
+                };
+                
+                if (rates[fromUnit] && rates[toUnit]) {
+                    result = fromValue * (rates[toUnit] / rates[fromUnit]);
+                } else {
+                    resultElement.textContent = 'Currency conversion not available offline';
+                    return;
+                }
+            }
+            
+            // Format very small or large numbers with scientific notation
+            let resultStr;
+            if (Math.abs(result) < 0.0001 || Math.abs(result) >= 1000000) {
+                resultStr = result.toExponential(4);
+            } else {
+                resultStr = result.toFixed(6).replace(/\.?0+$/, '');
+            }
+            
+            resultElement.textContent = `${fromValue} ${fromUnit} = ${resultStr} ${toUnit}`;
+        }
+        
+        async function getExchangeRate(fromCurrency, toCurrency) {
+            if (fromCurrency === toCurrency) return 1;
+            
+            // Try to get rates from localStorage first
+            const cachedRates = localStorage.getItem('currencyRates');
+            const cacheTime = localStorage.getItem('currencyRatesTime');
+            
+            if (cachedRates && cacheTime && (Date.now() - parseInt(cacheTime)) < 3600000) {
+                // Cache is less than 1 hour old
+                const rates = JSON.parse(cachedRates);
+                if (rates[fromCurrency] && rates[toCurrency]) {
+                    return rates[toCurrency] / rates[fromCurrency];
+                }
+            }
+            
+            // Fetch from API (using free tier)
+            try {
+                const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+                const data = await response.json();
+                
+                if (data && data.rates && data.rates[toCurrency]) {
+                    // Save to localStorage
+                    localStorage.setItem('currencyRates', JSON.stringify(data.rates));
+                    localStorage.setItem('currencyRatesTime', Date.now().toString());
+                    return data.rates[toCurrency];
+                }
+            } catch (error) {
+                console.error('Failed to fetch exchange rates:', error);
+                throw error;
+            }
+            
+            throw new Error('Exchange rate not available');
+        }
+        
+        // History Functions
+        function updateHistoryList() {
+            historyList.innerHTML = '';
+            
+            // Load history from localStorage if available
+            loadHistory();
+            
+            calculationHistory.slice().reverse().forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const date = new Date(entry.timestamp);
+                const dateStr = date.toLocaleString();
+                
+                historyItem.innerHTML = `
+                    <div><strong>${entry.expression} = ${entry.result}</strong></div>
+                    <div style="font-size: 0.8em; color: #7f8c8d;">${dateStr}</div>
+                `;
+                
+                historyItem.addEventListener('click', () => {
+                    currentInput = entry.result;
+                    updateDisplay();
+                });
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('calculatorHistory', JSON.stringify(calculationHistory));
+        }
+        
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('calculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+            }
+        }
+        
+        function clearHistory() {
+            calculationHistory = [];
+            updateHistoryList();
+            localStorage.removeItem('calculatorHistory');
+        }
+        
+        // Constants
+        function setupConstants() {
+            const constants = [
+                { name: 'π (pi)', value: Math.PI.toString() },
+                { name: 'e (Euler)', value: Math.E.toString() },
+                { name: 'Golden Ratio', value: '1.61803398875' },
+                { name: 'Gravitational Constant', value: '6.67430e-11' },
+                { name: 'Speed of Light', value: '299792458' },
+                { name: 'Planck Constant', value: '6.62607015e-34' },
+                { name: 'Avogadro Number', value: '6.02214076e23' },
+                { name: 'Boltzmann Constant', value: '1.380649e-23' },
+                { name: 'Electron Mass', value: '9.10938356e-31' },
+                { name: 'Proton Mass', value: '1.6726219e-27' },
+                { name: 'Neutron Mass', value: '1.6749275e-27' },
+                { name: 'Atomic Mass Unit', value: '1.660539e-27' },
+                { name: 'Vacuum Permittivity', value: '8.8541878128e-12' },
+                { name: 'Vacuum Permeability', value: '1.25663706212e-6' },
+                { name: 'Elementary Charge', value: '1.602176634e-19' },
+                { name: 'Rydberg Constant', value: '10973731.56816' },
+                { name: 'Stefan-Boltzmann', value: '5.670374419e-8' },
+                { name: 'Faraday Constant', value: '96485.33212' },
+                { name: 'Gas Constant', value: '8.314462618' },
+                { name: 'Gravitational Acceleration', value: '9.80665' }
+            ];
+            
+            const constantsGrid = document.querySelector('.constants-grid');
+            constantsGrid.innerHTML = '';
+            
+            constants.forEach(constant => {
+                const button = document.createElement('button');
+                button.textContent = constant.name;
+                button.title = constant.value;
+                button.addEventListener('click', () => {
+                    currentInput = constant.value;
+                    updateDisplay();
+                });
+                constantsGrid.appendChild(button);
+            });
+        }
+    </script>
+</body>
+</html>
