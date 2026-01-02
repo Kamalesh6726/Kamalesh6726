@@ -1,12 +1,9 @@
-- 👋 Hi, I’m Kamalesh Ganesh
-- 👀 I’m interested in coding 
-- 🌱 I’m currently learning AI & Ds
-- 💞️ I’m completed prompt engineering 
-- 📫 How to reach me kamaleshganesh6726@gmail.com
-- 😄 iam interested to work in IBM
-  
+👋 Hi, I’m Kamalesh Ganesh
 
-<!---
-Kamalesh6726/Kamalesh6726 is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+👀 I’m passionate about coding and problem-solving
+🌱 Currently learning Artificial Intelligence & Data Science
+💞️ Completed Prompt Engineering training
+📫 Reach me at: kamaleshganesh6726@gmail.com
+
+😄 Aspiring to build a career at IBM and contribute to impactful tech solutions
+
